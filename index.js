@@ -27,28 +27,82 @@ const openapi = {
 .prop('paths', S.array())
 console.log(schema.valueOf())*/
 
-fetch(`${baseUrl}/index.rst`)
+/*fetch(`${baseUrl}/index.rst`)
 .then(res => res.text())
 .then(body => {
+    fs.writeFileSync('dist/index.rst.json', JSON.stringify(parsed,null,4))
+});*/
 
-    const parsed = rstParser.parse(body);
+const baseDir = './developer.bitcoin.org/reference/rpc';
 
-    //fs.writeFileSync('dist/index.rst.json', JSON.stringify(parsed,null,4))
+const body = fs.readFileSync(`${baseDir}/index.rst`,'utf8')
 
-    const sections = [];
-    parsed.children[1].children.forEach(item => {
-        if (item.type === 'section') {
-            //console.log(item)
-            item.children.forEach(item2 => {
-                if (item2.type === 'directive') {
-                    item2.children.forEach(item3 => {
-                        if (item3.value && !item3.value.includes(':maxdepth:')) {
-                            console.log(item3)
-                        }
-                    })
-                }
-            })
-        }
-    })
-});
+const parsed = rstParser.parse(body);
+
+
+const sections = [];
+parsed.children[1].children.forEach(item => {
+    if (item.type === 'section') {
+        //console.log(item)
+        item.children.forEach(item2 => {
+            if (item2.type === 'directive') {
+                item2.children.forEach( async item3 => {
+                    if (item3.value && !item3.value.includes(':maxdepth:')) {
+
+                        let method = item3.value;
+                        let title = '';
+                        let description = '';
+
+                        if (!method) return;
+
+                        //console.log(method);
+
+                        const filename = `${baseDir}/${method}.rst`;
+
+                        fs.readFile(filename, 'utf8', (err, data) => {
+                          if (!err && data) {
+                            const rst = rstParser.parse(data);
+                            const def = rst.children[1];
+
+                            //if (method!=='validateaddress') return;
+
+                            //console.log(filename, JSON.stringify(def,null,4));
+
+                            def.children.forEach(item4 => {
+                                if (item4.type === 'title') {
+                                    title = item4.children[0].value;
+                                    console.log(title)
+                                }
+                                if (item4.type === 'paragraph') {
+                                    description = item4.children[0].value;
+                                    //console.log(description)
+                                }
+                                let json = ''
+                                if (item4.type === 'section') {
+                                    item4.children.forEach(item5 => {
+
+                                        if(item5.type === 'literal_block') {
+
+                                            description = item4.children[1].children.forEach(line => {
+                                                //console.log(line.value)
+                                                json += line.value+'\n';
+                                            });
+                                            console.log(json)
+                                        }
+                                    })
+
+                                }
+                            })
+                          }
+                          else {
+                            console.log('file not found', filename)
+                          }
+                        })
+                    }
+                })
+            }
+        })
+    }
+})
+
 

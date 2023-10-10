@@ -1,4 +1,6 @@
 # Logs
+developer.bitcoin.org
+
 logs
 *.log
 npm-debug.log*
