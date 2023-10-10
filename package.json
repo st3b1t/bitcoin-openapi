@@ -9,6 +9,7 @@
   "author": "st3b1t",
   "license": "MIT",
   "dependencies": {
+    "fluent-json-schema": "^4.2.0-beta.0",
     "restructured": "^0.0.11"
   }
 }

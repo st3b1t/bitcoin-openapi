@@ -1,5 +1,6 @@
 
 const {default: {parse}} = require('restructured');
+const S = require('fluent-json-schema');
 
 const rstUrl = 'https://raw.githubusercontent.com/bitcoin-dot-org/developer.bitcoin.org/master/reference/rpc/index.rst'
 
